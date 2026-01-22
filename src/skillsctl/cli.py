@@ -1,7 +1,20 @@
 """CLI entry point for skillsctl."""
 
+from __future__ import annotations
+
 import argparse
 import sys
+
+from .commands import (
+    cmd_catalog,
+    cmd_doctor,
+    cmd_install,
+    cmd_remove,
+    cmd_set,
+    cmd_status,
+    cmd_suggest,
+    cmd_sync,
+)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -36,19 +49,19 @@ def main(argv: list[str] | None = None) -> int:
     install_parser = subparsers.add_parser("install", help="Install skills")
     install_parser.add_argument("ids", nargs="+", help="Skill IDs to install")
     install_parser.add_argument("--stage", action="store_true", help="Stage git changes")
-    install_parser.add_argument("--yes", action="store_true", help="Skip confirmation")
+    install_parser.add_argument("--yes", "-y", action="store_true", help="Skip confirmation")
 
     # remove command
     remove_parser = subparsers.add_parser("remove", help="Remove skills")
     remove_parser.add_argument("ids", nargs="+", help="Skill IDs to remove")
     remove_parser.add_argument("--stage", action="store_true", help="Stage git changes")
-    remove_parser.add_argument("--yes", action="store_true", help="Skip confirmation")
+    remove_parser.add_argument("--yes", "-y", action="store_true", help="Skip confirmation")
 
     # set command
     set_parser = subparsers.add_parser("set", help="Set exact skill list")
     set_parser.add_argument("ids", nargs="+", help="Skill IDs to set")
     set_parser.add_argument("--stage", action="store_true", help="Stage git changes")
-    set_parser.add_argument("--yes", action="store_true", help="Skip confirmation")
+    set_parser.add_argument("--yes", "-y", action="store_true", help="Skip confirmation")
 
     # sync command
     sync_parser = subparsers.add_parser("sync", help="Sync skills from manifest")
@@ -67,9 +80,26 @@ def main(argv: list[str] | None = None) -> int:
         parser.print_help()
         return 1
 
-    # TODO: Implement command handlers
-    print(f"Command '{args.command}' not yet implemented")
-    return 0
+    # Dispatch commands
+    if args.command == "doctor":
+        return cmd_doctor()
+    elif args.command == "status":
+        return cmd_status(as_json=args.json)
+    elif args.command == "catalog":
+        return cmd_catalog(as_json=args.json)
+    elif args.command == "suggest":
+        return cmd_suggest(args.query, limit=args.limit, as_json=args.json)
+    elif args.command == "install":
+        return cmd_install(args.ids, stage=args.stage, yes=args.yes)
+    elif args.command == "remove":
+        return cmd_remove(args.ids, stage=args.stage, yes=args.yes)
+    elif args.command == "set":
+        return cmd_set(args.ids, stage=args.stage, yes=args.yes)
+    elif args.command == "sync":
+        return cmd_sync(stage=args.stage)
+    else:
+        print(f"Unknown command: {args.command}", file=sys.stderr)
+        return 1
 
 
 if __name__ == "__main__":
