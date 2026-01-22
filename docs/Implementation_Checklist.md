@@ -1,5 +1,5 @@
 # Implementation Checklist: Skill Manager (v1)
-Дата: 2026-01-22  
+Дата: 2026-01-22
 Цель: реализовать детерминированный менеджер скиллов для проектов (submodule + sparse-checkout + каталог + UX для агентов).
 
 ## A. Central skills-repo
